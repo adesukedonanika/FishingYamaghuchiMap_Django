@@ -1,0 +1,13 @@
+envi_PC
+
+pass
+
+13120192
+
+
+psql -U postgres
+13120192
+
+postgres=#
+create database fishingYmap;
+
