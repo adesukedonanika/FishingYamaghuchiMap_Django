@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8" />
+    <title>釣っちょる!?Map</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https//code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- 地図 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="css/index.css">
+
+    <script src="data/City.js"></script>
+    <script src="data/Gyokou.js"></script>
+
+    <script>
+        // 初期表示　init()　 map機能
+        function init() {
+            var basemap = L.map('basemap', {
+                zoomControl: true,
+                maxZoom: 28,
+                minZoom: 1
+            }).fitBounds([
+                [34.26388667344394, 130.8754045491621],
+                [34.65746410047117, 131.71591272829488]
+            ]);
+            mapLink = '<a href="https://openstreetmap.org">OpenStreetMap</a>';
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: 'Map data&copy; ' + mapLink,
+                    maxZoom: 18
+                }).addTo(basemap);
+
+
+            // 計測ツール
+            var measureControl = new L.Control.Measure({
+                position: 'topleft',
+                primaryLengthUnit: 'meters',
+                secondaryLengthUnit: 'kilometers',
+                primaryAreaUnit: 'sqmeters',
+                secondaryAreaUnit: 'hectares'
+            });
+            measureControl.addTo(basemap);
+            document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+                .innerHTML = '';
+            document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+                .className += ' fas fa-ruler';
+        }
+    </script>
+
+
+
+<head>    
+
+</head>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expand="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon">
+            </span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item">
+                    <a class="nav-link" href="/youtube">Youtube</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/note">note</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/SampleMap">SampleMap</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+<div class="main">
+    <body onload="init()">
+        <div id="basemap" style="width: 100%; height: 400px; border: solid 1px"></div>>
+
+        <div id="footer">youtube</div>
+</body>
+
+</div>
+
+<div class="footer-logo">
+    <ul>
+        <li>Link1</li>
+        <li>Link2</li>
+        <li>Link3</li>
+    </ul>
+</div>
+
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8" />
+    <title>釣っちょる!?Map</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https//code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- 地図 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="css/index.css">
+
+    <script src="data/City.js"></script>
+    <script src="data/Gyokou.js"></script>
+
+    <script>
+        // 初期表示　init()　 map機能
+        function init() {
+            var basemap = L.map('basemap', {
+                zoomControl: true,
+                maxZoom: 28,
+                minZoom: 1
+            }).fitBounds([
+                [34.26388667344394, 130.8754045491621],
+                [34.65746410047117, 131.71591272829488]
+            ]);
+            mapLink = '<a href="https://openstreetmap.org">OpenStreetMap</a>';
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: 'Map data&copy; ' + mapLink,
+                    maxZoom: 18
+                }).addTo(basemap);
+
+
+            // 計測ツール
+            var measureControl = new L.Control.Measure({
+                position: 'topleft',
+                primaryLengthUnit: 'meters',
+                secondaryLengthUnit: 'kilometers',
+                primaryAreaUnit: 'sqmeters',
+                secondaryAreaUnit: 'hectares'
+            });
+            measureControl.addTo(basemap);
+            document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+                .innerHTML = '';
+            document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+                .className += ' fas fa-ruler';
+        }
+    </script>
+
+
+
+<head>    
+
+</head>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expand="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon">
+            </span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item">
+                    <a class="nav-link" href="/youtube">Youtube</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/note">note</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/SampleMap">SampleMap</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+<body>
+    <div id="map">
+    </div>
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+    <script src="js/leaflet-search.js"></script>
+    <script src="data/_1.js"></script>
+    <script src="data/_2.js"></script>
+    <script>
+        var highlightLayer;
+
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+                highlightLayer.setStyle({
+                    color: '#ffff00',
+                });
+            } else {
+                highlightLayer.setStyle({
+                    fillColor: '#ffff00',
+                    fillOpacity: 1
+                });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl: true,
+            maxZoom: 28,
+            minZoom: 1
+        }).fitBounds([
+            [33.510270695792066, 130.73197048459448],
+            [35.00123289445819, 132.5346251801855]
+        ]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        L.control.locate({
+            locateOptions: {
+                maxZoom: 19
+            }
+        }).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+            .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+            .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+
+        function setBounds() {}
+        var layer_OpenStreetMap_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        // map.addLayer(layer_OpenStreetMap_0);
+
+        function pop__1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? Autolinker.link(feature.properties['OBJECTID'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">市町村名</th>\
+                        <td>' + (feature.properties['市町村名'] !== null ? Autolinker.link(feature.properties['市町村名'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_Leng'] !== null ? Autolinker.link(feature.properties['SHAPE_Leng'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_Area'] !== null ? Autolinker.link(feature.properties['SHAPE_Area'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {
+                maxHeight: 400
+            });
+        }
+
+        function style__1_0(feature) {
+            switch (String(feature.properties['市町村名'])) {
+                case '阿武町':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(157,21,219,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '宇部市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(224,119,163,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '下関市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(127,227,186,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '下松市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(165,118,240,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '岩国市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(214,87,58,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '光市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(208,224,65,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '山口市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(125,175,222,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '山陽小野田市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(134,208,22,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '周南市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(85,226,20,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '周防大島町':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(30,200,27,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '上関町':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(238,199,40,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '長門市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(200,102,201,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '田布施町':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(34,175,207,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '萩市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(208,118,28,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '美祢市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(47,33,200,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '平生町':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(223,89,105,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '防府市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(83,205,191,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '柳井市':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(127,220,153,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case '和木町':
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(206,60,165,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                default:
+                    return {
+                        pane: 'pane__1',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(75,110,236,1.0)',
+                        interactive: true,
+                    }
+                    break;
+            }
+        }
+        map.createPane('pane__1');
+        map.getPane('pane__1').style.zIndex = 401;
+        map.getPane('pane__1').style['mix-blend-mode'] = 'normal';
+        var layer__1 = new L.geoJson(json__1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json__1',
+            layerName: 'layer__1',
+            pane: 'pane__1',
+            onEachFeature: pop__1,
+            style: style__1_0,
+        });
+        bounds_group.addLayer(layer__1);
+        map.addLayer(layer__1);
+
+        function pop__2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_001'] !== null ? Autolinker.link(feature.properties['C09_001'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_002'] !== null ? Autolinker.link(feature.properties['C09_002'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_003'] !== null ? Autolinker.link(feature.properties['C09_003'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_004'] !== null ? Autolinker.link(feature.properties['C09_004'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_005'] !== null ? Autolinker.link(feature.properties['C09_005'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_006'] !== null ? Autolinker.link(feature.properties['C09_006'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_007'] !== null ? Autolinker.link(feature.properties['C09_007'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_008'] !== null ? Autolinker.link(feature.properties['C09_008'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_009'] !== null ? Autolinker.link(feature.properties['C09_009'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['C09_010'] !== null ? Autolinker.link(feature.properties['C09_010'].toLocaleString(), {
+                truncate: {
+                    length: 30,
+                    location: 'smart'
+                }
+            }) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {
+                maxHeight: 400
+            });
+        }
+
+        function style__2_0() {
+            return {
+                pane: 'pane__2',
+                rotationAngle: 0.0,
+                rotationOrigin: 'center center',
+                icon: L.icon({
+                    iconUrl: 'markers/shopping_tackle.svg',
+                    iconSize: [16.72, 16.72]
+                }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane__2');
+        map.getPane('pane__2').style.zIndex = 402;
+        map.getPane('pane__2').style['mix-blend-mode'] = 'normal';
+        var layer__2 = new L.geoJson(json__2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json__2',
+            layerName: 'layer__2',
+            pane: 'pane__2',
+            onEachFeature: pop__2,
+            pointToLayer: function(feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style__2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer__2);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps, {
+            '<img src="legend/_2.png" /> 漁港名': layer__2,
+            '山口県市町村<br /><table><tr><td style="text-align: center;"><img src="legend/_1_阿武町0.png" /></td><td>阿武町</td></tr><tr><td style="text-align: center;"><img src="legend/_1_宇部市1.png" /></td><td>宇部市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_下関市2.png" /></td><td>下関市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_下松市3.png" /></td><td>下松市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_岩国市4.png" /></td><td>岩国市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_光市5.png" /></td><td>光市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_山口市6.png" /></td><td>山口市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_山陽小野田市7.png" /></td><td>山陽小野田市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_周南市8.png" /></td><td>周南市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_周防大島町9.png" /></td><td>周防大島町</td></tr><tr><td style="text-align: center;"><img src="legend/_1_上関町10.png" /></td><td>上関町</td></tr><tr><td style="text-align: center;"><img src="legend/_1_長門市11.png" /></td><td>長門市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_田布施町12.png" /></td><td>田布施町</td></tr><tr><td style="text-align: center;"><img src="legend/_1_萩市13.png" /></td><td>萩市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_美祢市14.png" /></td><td>美祢市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_平生町15.png" /></td><td>平生町</td></tr><tr><td style="text-align: center;"><img src="legend/_1_防府市16.png" /></td><td>防府市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_柳井市17.png" /></td><td>柳井市</td></tr><tr><td style="text-align: center;"><img src="legend/_1_和木町18.png" /></td><td>和木町</td></tr><tr><td style="text-align: center;"><img src="legend/_1_19.png" /></td><td></td></tr></table>': layer__1,
+            "OpenStreetMap": layer_OpenStreetMap_0,
+        }, {
+            collapsed: false
+        }).addTo(map);
+        setBounds();
+        var i = 0;
+        layer__1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['市町村名'] !== null ? String('<div style="color: #000000; font-size: 12pt; font-family: \'MS UI Gothic\', sans-serif;">' + layer.feature.properties['市町村名']) + '</div>' : ''), {
+                permanent: true,
+                offset: [-0, -16],
+                className: 'css__1'
+            });
+            labels.push(layer);
+            totalMarkers += 1;
+            layer.added = true;
+            addLabel(layer, i);
+            i++;
+        });
+        var i = 0;
+        layer__2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['C09_002'] !== null ? String('<div style="color: #e31a1c; font-size: 10pt; font-family: \'MS UI Gothic\', sans-serif;">' + layer.feature.properties['C09_002']) + '</div>' : ''), {
+                permanent: true,
+                offset: [-0, -16],
+                className: 'css__2'
+            });
+            labels.push(layer);
+            totalMarkers += 1;
+            layer.added = true;
+            addLabel(layer, i);
+            i++;
+        });
+        map.addControl(new L.Control.Search({
+            layer: layer__2,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'C09_002'
+        }));
+        document.getElementsByClassName('search-button')[0].className +=
+            ' fa fa-binoculars';
+        resetLabels([layer__1, layer__2]);
+        map.on("zoomend", function() {
+            resetLabels([layer__1, layer__2]);
+        });
+        map.on("layeradd", function() {
+            resetLabels([layer__1, layer__2]);
+        });
+        map.on("layerremove", function() {
+            resetLabels([layer__1, layer__2]);
+        });
+    </script>
+
+<!-- <div class="main">
+    <body onload="init()">
+        <div id="basemap" style="width: 100%; height: 400px; border: solid 1px"></div>>
+    </body> -->
+
+</body>
+
+
+</body>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div id="footer">youtube</div>
+
+<div class="footer-logo">
+    <ul>
+        <li>Link1</li>
+        <li>Link2</li>
+        <li>Link3</li>
+    </ul>
+</div>
+
+</html>
